@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Belgium Algorithm Contest</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://www.w3schools.com/lib/w3data.js"></script> 
+<style>
+html {
+    overflow-y: scroll; 
+}
+</style>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <img src="bac.png" alt="logo" style="width:20%">
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <ul class="nav navbar-nav">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="past.html">Previous problems</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="contact.html">Registration</a></li>
+      <li><a href="participants.html">Participants</a></li>
+      <li><a href="creator.html">Contest creator</a></li>
+      <li class="dropdown active">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Global results<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="g2017.html">2017</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Round results<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="r1.html">Round 1 - 2017</a></li>
+          <li><a href="r2.html">Round 2 - 2017</a></li>
+          <li><a href="r3.html">Round 3 - 2017</a></li>
+          <li><a href="r4.html">Round 4 - 2017</a></li>
+        </ul>
+      </li>
+      <li><a href="https://belgiumac.slack.com/">BAC Slack</a></li>
+    </ul>
+  </div>
+</nav>
+</div>
+
+<div id="container" class="container">
+<div class="row">
+<div class="main-wrapper"  width="100%">
+  <div class="entry-content">
+
+
+<h3>Global scoreboard</h3><table class="table">
+<thead>
+<tr>
+<th>Rank</th>
+<th class="name">Contestant</th>
+<th class="name">University</th>
+<th class="problems">Number of problems solved</th>
+<th class="score">Total time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Victor Lecomte</td>
+<td>UCL</td>
+<td>11</td>
+<td>542</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Henri Devillez</td>
+<td>UCL</td>
+<td>9</td>
+<td>546</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Damien Galant</td>
+<td>UMons</td>
+<td>9</td>
+<td>700</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Simon Tihon</td>
+<td>UCL</td>
+<td>9</td>
+<td>729</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Floris Kint</td>
+<td>KUL</td>
+<td>8</td>
+<td>289</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Robin Jadoul</td>
+<td>UAntwerp</td>
+<td>8</td>
+<td>388</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Pierre Vandenhove</td>
+<td>UMons</td>
+<td>7</td>
+<td>226</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Bruno Ploumhans</td>
+<td>beCP</td>
+<td>7</td>
+<td>265</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Matteo Couplet</td>
+<td>UCL</td>
+<td>7</td>
+<td>350</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Jorik Jooken</td>
+<td>KUL</td>
+<td>6</td>
+<td>509</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Damien Lefevre</td>
+<td>UMons</td>
+<td>5</td>
+<td>359</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Vianney Coppé</td>
+<td>UCL</td>
+<td>4</td>
+<td>170</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Adrien Couplet</td>
+<td>UCL</td>
+<td>4</td>
+<td>183</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Brieuc Pinon</td>
+<td>UCL</td>
+<td>4</td>
+<td>273</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Victor Dheur</td>
+<td>UMons</td>
+<td>4</td>
+<td>303</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Gaetan Staquet</td>
+<td>UMons</td>
+<td>3</td>
+<td>409</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Jean-Martin Vlaeminck</td>
+<td>UCL</td>
+<td>1</td>
+<td>15</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Pierre Zielinski</td>
+<td>UMons</td>
+<td>1</td>
+<td>50</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Alexandre Terefenko</td>
+<td>UMons</td>
+<td>1</td>
+<td>58</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Thomas Ave</td>
+<td>UAntwerp</td>
+<td>1</td>
+<td>178</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Alexandre Dubray</td>
+<td>UCL</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Cedric Pilattee</td>
+<td>UMons</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Guillaume Huysmans</td>
+<td>UMons</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Morine Delhelle</td>
+<td>UCL</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>21</td>
+<td>Ruben Van Dijck</td>
+<td>beCP</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3>KUL scoreboard</h3><table class="table">
+<thead>
+<tr>
+<th>Rank</th>
+<th class="name">Contestant</th>
+<th class="name">University</th>
+<th class="problems">Number of problems solved</th>
+<th class="score">Total time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Floris Kint</td>
+<td>KUL</td>
+<td>8</td>
+<td>289</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Jorik Jooken</td>
+<td>KUL</td>
+<td>6</td>
+<td>509</td>
+</tr>
+</tbody>
+</table>
+<h3>UAntwerp scoreboard</h3><table class="table">
+<thead>
+<tr>
+<th>Rank</th>
+<th class="name">Contestant</th>
+<th class="name">University</th>
+<th class="problems">Number of problems solved</th>
+<th class="score">Total time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Robin Jadoul</td>
+<td>UAntwerp</td>
+<td>8</td>
+<td>388</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Thomas Ave</td>
+<td>UAntwerp</td>
+<td>1</td>
+<td>178</td>
+</tr>
+</tbody>
+</table>
+<h3>UCL scoreboard</h3><table class="table">
+<thead>
+<tr>
+<th>Rank</th>
+<th class="name">Contestant</th>
+<th class="name">University</th>
+<th class="problems">Number of problems solved</th>
+<th class="score">Total time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Victor Lecomte</td>
+<td>UCL</td>
+<td>11</td>
+<td>542</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Henri Devillez</td>
+<td>UCL</td>
+<td>9</td>
+<td>546</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Simon Tihon</td>
+<td>UCL</td>
+<td>9</td>
+<td>729</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Matteo Couplet</td>
+<td>UCL</td>
+<td>7</td>
+<td>350</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Vianney Coppé</td>
+<td>UCL</td>
+<td>4</td>
+<td>170</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Adrien Couplet</td>
+<td>UCL</td>
+<td>4</td>
+<td>183</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Brieuc Pinon</td>
+<td>UCL</td>
+<td>4</td>
+<td>273</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Jean-Martin Vlaeminck</td>
+<td>UCL</td>
+<td>1</td>
+<td>15</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Alexandre Dubray</td>
+<td>UCL</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Morine Delhelle</td>
+<td>UCL</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3>UMons scoreboard</h3><table class="table">
+<thead>
+<tr>
+<th>Rank</th>
+<th class="name">Contestant</th>
+<th class="name">University</th>
+<th class="problems">Number of problems solved</th>
+<th class="score">Total time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Damien Galant</td>
+<td>UMons</td>
+<td>9</td>
+<td>700</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Pierre Vandenhove</td>
+<td>UMons</td>
+<td>7</td>
+<td>226</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Damien Lefevre</td>
+<td>UMons</td>
+<td>5</td>
+<td>359</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Victor Dheur</td>
+<td>UMons</td>
+<td>4</td>
+<td>303</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Gaetan Staquet</td>
+<td>UMons</td>
+<td>3</td>
+<td>409</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Pierre Zielinski</td>
+<td>UMons</td>
+<td>1</td>
+<td>50</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Alexandre Terefenko</td>
+<td>UMons</td>
+<td>1</td>
+<td>58</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Cedric Pilattee</td>
+<td>UMons</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Guillaume Huysmans</td>
+<td>UMons</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h3>beCP scoreboard</h3><table class="table">
+<thead>
+<tr>
+<th>Rank</th>
+<th class="name">Contestant</th>
+<th class="name">University</th>
+<th class="problems">Number of problems solved</th>
+<th class="score">Total time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Bruno Ploumhans</td>
+<td>beCP</td>
+<td>7</td>
+<td>265</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Ruben Van Dijck</td>
+<td>beCP</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+  </div><!-- .entry-content -->
+</div>
+</div>
+</div><!-- #container -->
+
+</body>
+</html>
+
