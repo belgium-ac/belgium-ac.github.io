@@ -17,8 +17,6 @@
   <p>This tool is still under construction</p>
 </div>
 
-
-
 <div id="menu" class="container">
 
 <div class="input-group mb-3">
@@ -36,7 +34,7 @@
   <div class="input-group-prepend">
     <span class="input-group-text" id="basic-addon1">Wait time (s):</span>
   </div>
-  <input id="wait" type="text" class="form-control" value="1" placeholder="10" aria-label="time" aria-describedby="basic-addon1">
+  <input id="wait" type="text" class="form-control" value="10" placeholder="10" aria-label="time" aria-describedby="basic-addon1">
 
   <div class="input-group-prepend">
    <span class="input-group-text" id="basic-addon1">Duration (m):</span>
@@ -47,24 +45,9 @@
   <div class="input-group-prepend">
     <span class="input-group-text" id="basic-addon1">Speed factor (s):</span>
   </div>
-  <input id="speed" type="text" class="form-control" value="600" placeholder="1" aria-label="time" aria-describedby="basic-addon1">
+  <input id="speed" type="text" class="form-control" value="1" placeholder="1" aria-label="time" aria-describedby="basic-addon1">
   
 </div>
-
-<div class="input-group mb-3">
-  <div class="input-group-prepend">
-    <span class="input-group-text" id="basic-addon1">Team name:</span>
-  </div>
-  <input id="teamname" type="text" class="form-control" value="Your team" placeholder="Your team" aria-label="time" aria-describedby="basic-addon1">
-</div>
-
-<div class="input-group mb-3">
-  <div class="input-group-prepend">
-    <span class="input-group-text" id="basic-addon1">University:</span>
-  </div>
-  <input id="university" type="text" class="form-control" placeholder="Your university name (optional)" aria-label="time" aria-describedby="basic-addon1">
-</div>
-
 
 <button type="button" class="btn btn-primary" onclick="loadFile()">Start simulation</button>
 </div>
@@ -87,26 +70,28 @@ function loadFile() {
   var wait = parseInt(document.getElementById("wait").value);
   var duration = parseInt(document.getElementById("duration").value);
   var speed = parseInt(document.getElementById("speed").value);
-
-  var teamname = document.getElementById("teamname").value;
-  var university = document.getElementById("university").value;
-
-
   if (file) {
     var reader = new FileReader();
     reader.readAsText(file, "UTF-8");
     reader.onload = function (evt) {
         text = evt.target.result;
-        simulate(text, wait, duration, speed, teamname, university);
+        simulate(text, wait, duration, speed);
     }
     reader.onerror = function (evt) {
-      alert('could not load file');
+      alert('could not');
+      document.createElement('div');
+      document.className = "alert alert-danger";
+      document.innerHTML = "Could not read the scoreboard file."
     }
   }
 }
 
+function simulate(html, wait, duration, speed) {
 
-function simulate(html, wait, duration, speed, teamname, university) {
+  console.log(html);
+  
+	//text = readTextFile(path);
+  initializeScoreboard();
 	ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	INF = 1000000000
 	DURATION = duration;
@@ -114,68 +99,29 @@ function simulate(html, wait, duration, speed, teamname, university) {
 	DELTA2 = 5;
 	SPEED = speed;
 	WAIT = wait;
-  TEAM_NAME = teamname;
-  TEAM_UNIVERSITY = university;
-  RUNNING = false;
 
-	var root = document.createElement('html');
-	root.innerHTML = html;
-  console.log(html);
-	parsers = detectParsers(root);
-
-	var data = parseGeneral(root, parsers[0], parsers[1]);
-  var teams = data[0];
-  var nbProblems = data[1];
-
-  
-
-	//text = readTextFile(path);
-  initializeScoreboard(nbProblems);
-
-  createTableHeader(nbProblems);
-
-  var yourteam = createYourTeam();
-  teams.push(yourteam);
-	
-	var startTime = new Date();
-
-
-  document.querySelector('body').addEventListener('click', function(event) {
-		if(RUNNING && event.target.id.length == 1 && ALPHABET.includes(event.target.id)) {
-      var pid = ALPHABET.indexOf(event.target.id);
-      console.log(pid);
-      if(event.target.className == 'btn btn-default') {
-        event.target.className = 'btn btn-success';
-        yourteam.tries[pid] = 1
-        var curTime = new Date();
-        var time = Math.floor((curTime - startTime) / (60000 / SPEED));
-        yourteam.times[pid] = time;
-        fillScoreboard(time, teams);
-      } else {
-        //event.target.className = 'btn btn-default';
-      }
-    }
-  });
 
 	//alert(text);
 
+	var root = document.createElement('html');
+	root.innerHTML = html;
 
 	//teams = parseCERC(root);
 	//teams = parseDomjudge(root);
 
+	parsers = detectParsers(root);
 
+	var teams = parseGeneral(root, parsers[0], parsers[1]);
 
-  fillScoreboard(0, teams);
+	fillScoreboard(0, teams);
 
-
-
+	var startTime = new Date();
 
 	waitTimer = setInterval(function() {
 		var curTime = new Date();
 		var seconds = Math.floor((curTime - startTime) / 1000);
 		setWaitTimeLeft(seconds);
 		if(seconds > WAIT) {
-      RUNNING = true;
 		  setTimeLeft(0);
 		  startTime = new Date();
 			timer = setInterval(function() {
@@ -183,11 +129,10 @@ function simulate(html, wait, duration, speed, teamname, university) {
 				var time = Math.floor((curTime - startTime) / (60000 / SPEED));
 				setTimeLeft(time);
 				if(time > DURATION) {
-					fillScoreboard(DURATION, teams, yourteam);
+					fillScoreboard(DURATION, teams);
 					document.getElementById('bar').className = 'progress-bar progress-bar-striped'
 					document.getElementById('bar').style = 'width: 100%';
 					clearInterval(timer);
-          RUNNING = false;
 				} else {
 					var percent =  Math.floor(100 * time / DURATION);
 					document.getElementById('bar').style = 'width: ' + percent + '%';
@@ -199,80 +144,8 @@ function simulate(html, wait, duration, speed, teamname, university) {
 	}, 100);
 }
 
-
-function createTeamPanel(nbProblems) {
-  var div = document.createElement("div");
-  //div.className = 'container';
-  div.id = 'main';
-  var table = document.createElement("table");
-  table.className = 'table';
-  thead = document.createElement('thead');
-  tr = document.createElement('tr');
-
-  th = document.createElement('th');
-  th.innerHTML = 'Rank';
-  th.className = 'table-dark text-center align-middle';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = '1';
-  th.id = 'yourRank';
-  th.className = 'text-center align-middle';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = 'Solved';
-  th.className = 'table-dark text-center align-middle';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.className = 'text-center align-middle';
-  th.innerHTML = '0';
-  th.id = 'yourSolved';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = 'Time'; 
-  th.className = 'table-dark text-center align-middle'; 
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = '0';
-  th.id = 'yourTime';
-  th.className = 'text-center align-middle';
-  tr.appendChild(th);
-  
-  var tmp = [ ]
-  for(var i = 0; i < nbProblems; i++) {
-    th = document.createElement('th');
-    //th.innerHTML = ALPHABET[i];
-    but = document.createElement('button');
-    but.className = 'btn btn-default';
-    but.innerHTML = ALPHABET[i];
-    but.id = ALPHABET[i];
-    /*
-    if(i % 2 == 0) {
-      th.className = 'table-active text-center';
-    } else {
-      th.className = 'table-secondary text-center';
-    }
-    tmp.push(th);
-    */
-    th.appendChild(but);
-    tr.appendChild(th);
-  }
-  thead.appendChild(tr);
-  table.append(thead);
-  div.appendChild(table);
-  document.body.appendChild(div);
-  
-}
-
-
-function initializeScoreboard(nbProblems) {
-  document.body.innerHTML = '';
-  createTeamPanel(nbProblems);
-  document.body.innerHTML += '<br><div class="container-fluid"><h3 id="title">Scoreboard</h3><div id="timeleft"></div><div class="progress"><div id="bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div><table class="table"><thead><tr id="tableheader"><th>Rank</th><th class="name">Team</th><th class="name">University</th><th class="problems">Solved</th><th class="score">Time</th></tr></thead><tbody id="tablebody"></tbody>';
+function initializeScoreboard() {
+  document.body.innerHTML = '<div class="container-fluid"><h3 id="title">Scoreboard</h3><div id="timeleft"></div><div class="progress"><div id="bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div><table class="table"><thead><tr id="tableheader"><th>Rank</th><th class="name">Team</th><th class="name">University</th><th class="problems">Solved</th><th class="score">Time</th></tr></thead><tbody id="tablebody"></tbody>';
   /*
   var element = document.getElementById("menu");
   element.outerHTML = "";
@@ -303,45 +176,6 @@ function initializeScoreboard(nbProblems) {
   table.appendChild(tbody);
   document.body.appendChild(table);
   */
-
-  /*
-  var div = document.getElementById("main");
-
-  var table = document.createElement("table");
-  table.className = 'table';
-  thead = document.createElement('thead');
-  thead.id = 'tableheader';
-  tr = document.createElement('tr');
-
-  th = document.createElement('th');
-  th.innerHTML = 'Rank';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = 'Team';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = 'University';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = 'Solved';
-  tr.appendChild(th);
-
-  th = document.createElement('th');
-  th.innerHTML = 'Time'; 
-  tr.appendChild(th);
-
-  thead.appendChild(tr);
-  table.append(thead);
-
-  var tbody = document.createElement("tbody");
-  tbody.id = 'tablebody';
-  table.appendChild(tbody);
-  div.appendChild(table);
-  */
-  
 }
 
 function setWaitTimeLeft(seconds) {
@@ -417,46 +251,35 @@ function fillScoreboard(time, teams) {
     if(i > 0 && !sameRank(curTeams[i - 1], curTeams[i])) {
       rank += 1;
     }
-    curTeams[i].rank = rank;
-    if(curTeams[i].name == TEAM_NAME) {
-      document.getElementById('yourRank').innerHTML = curTeams[i].rank;
-      document.getElementById('yourSolved').innerHTML = curTeams[i].nbSolved;
-      document.getElementById('yourTime').innerHTML = curTeams[i].totalTime;
-    }
-
     var row = document.createElement('tr');
+
     col = document.createElement('th');
-    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = rank;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].name;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].university;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].nbSolved;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].totalTime;
     row.appendChild(col);
 
     for(var j = 0; j < curTeams[i].times.length; j++) {
       col = document.createElement('th');
       if(curTeams[i].times[j] < INF) {
-        col.className = 'alert table-success text-center'
+        col.className = 'alert alert-success text-center'
         col.innerHTML = curTeams[i].tries[j] + '/' + curTeams[i].times[j] 
       } else if(curTeams[i].tries[j] > 0) {
-        col.className = 'alert table-danger text-center'
+        col.className = 'alert alert-danger text-center'
         col.innerHTML = curTeams[i].tries[j] + ''
       }
       col.style = 'min-width: 60px;'
@@ -464,8 +287,6 @@ function fillScoreboard(time, teams) {
     }
     elem.appendChild(row);
   }
-
-  
 }
 
 function compareTeams(a, b) {
@@ -495,6 +316,7 @@ function parseGeneral(root, findNbProblems, parseTeam) {
   scoreboard = findScoreboardTable(root);
   var rows = scoreboard.getElementsByTagName('tr');
   nbProblems = findNbProblems(rows[0]);
+  createTableHeader(nbProblems);
   var teams = [ ];
   var rowSize = rows[0].getElementsByTagName('th').length;
   console.log(rowSize);
@@ -504,7 +326,7 @@ function parseGeneral(root, findNbProblems, parseTeam) {
     teams.push(team);
   }
   genRandomTimes(teams, nbProblems);
-  return [teams, nbProblems];
+  return teams;
 }
 
 /*
@@ -523,8 +345,6 @@ function parseGeneral(root, findNbProblems, parseTeam) {
   return teams;
 }
 */
-
-
 
 function genRandomTimes(teams, nbProblems) {
   var averages = [ ];
@@ -624,21 +444,6 @@ function domjudgeParseRow(row, nbProblems) {
     }
   }
   return team;
-}
-
-function createYourTeam() {
-  var yourteam = { }
-  yourteam.tries = [ ];
-  yourteam.times = [ ];
-  yourteam.name = TEAM_NAME;
-  yourteam.university = TEAM_UNIVERSITY;
-  yourteam.wrongTries = [ ]
-  for(var j = 0; j < nbProblems; j++) {
-    yourteam.tries.push(0);
-    yourteam.times.push(INF);
-    yourteam.wrongTries.push([ ]);
-  }
-  return yourteam;
 }
 
 function CERCNbProblems(row) {
