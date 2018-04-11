@@ -41,14 +41,20 @@
   <div class="input-group-prepend">
    <span class="input-group-text" id="basic-addon1">Duration (m):</span>
   </div>
-  <input id="duration" type="text" class="form-control" value="300" placeholder="300" aria-label="time" aria-describedby="basic-addon1">
+  <input id="duration" type="text" class="form-control" value="300" placeholder="" aria-label="time" aria-describedby="basic-addon1">
 
 
   <div class="input-group-prepend">
     <span class="input-group-text" id="basic-addon1">Speed factor (s):</span>
   </div>
-  <input id="speed" type="text" class="form-control" value="1" placeholder="1" aria-label="time" aria-describedby="basic-addon1">
+  <input id="speed" type="text" class="form-control" value="1" placeholder="" aria-label="time" aria-describedby="basic-addon1">
   
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Start time (m):</span>
+  </div>
+  <input id="start" type="text" class="form-control" value="0" placeholder="" aria-label="time" aria-describedby="basic-addon1">
+  
+
 </div>
 
 <div class="input-group mb-3">
@@ -87,7 +93,7 @@ function loadFile() {
   var wait = parseInt(document.getElementById("wait").value);
   var duration = parseInt(document.getElementById("duration").value);
   var speed = parseInt(document.getElementById("speed").value);
-
+  var start = parseInt(document.getElementById("start").value);
   var teamname = document.getElementById("teamname").value;
   var university = document.getElementById("university").value;
 
@@ -97,7 +103,7 @@ function loadFile() {
     reader.readAsText(file, "UTF-8");
     reader.onload = function (evt) {
         text = evt.target.result;
-        simulate(text, wait, duration, speed, teamname, university);
+        simulate(text, wait, duration, speed, start, teamname, university);
     }
     reader.onerror = function (evt) {
       alert('could not load file');
@@ -106,7 +112,7 @@ function loadFile() {
 }
 
 
-function simulate(html, wait, duration, speed, teamname, university) {
+function simulate(html, wait, duration, speed, start, teamname, university) {
 	ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	INF = 1000000000
 	DURATION = duration;
@@ -117,6 +123,8 @@ function simulate(html, wait, duration, speed, teamname, university) {
   TEAM_NAME = teamname;
   TEAM_UNIVERSITY = university;
   RUNNING = false;
+  DELTA_TIME = start;
+  if(DELTA_TIME > 0) WAIT = -1;
 
 	var root = document.createElement('html');
 	root.innerHTML = html;
@@ -147,15 +155,14 @@ function simulate(html, wait, duration, speed, teamname, university) {
       if(event.target.className == 'btn btn-default') {
         event.target.className = 'btn btn-success';
         yourteam.tries[pid] = 1
-        var curTime = new Date();
-        var time = Math.floor((curTime - startTime) / (60000 / SPEED));
+        var time = getTime(startTime);
         yourteam.times[pid] = time;
         fillScoreboard(time, teams);
       } else {
         event.target.className = 'btn btn-default';
         yourteam.tries[pid] = 0
         yourteam.times[pid] = INF;
-        fillScoreboard(time, teams);
+        fillScoreboard(getTime(startTime), teams);
       }
     }
   });
@@ -166,12 +173,8 @@ function simulate(html, wait, duration, speed, teamname, university) {
 	//teams = parseCERC(root);
 	//teams = parseDomjudge(root);
 
-
-
-  fillScoreboard(0, teams);
-
-
-
+  var time = getTime(startTime);
+  fillScoreboard(time, teams);
 
 	waitTimer = setInterval(function() {
 		var curTime = new Date();
@@ -182,8 +185,7 @@ function simulate(html, wait, duration, speed, teamname, university) {
 		  setTimeLeft(0);
 		  startTime = new Date();
 			timer = setInterval(function() {
-				var curTime = new Date();
-				var time = Math.floor((curTime - startTime) / (60000 / SPEED));
+				var time = getTime(startTime);
 				setTimeLeft(time);
 				if(time > DURATION) {
 					fillScoreboard(DURATION, teams, yourteam);
@@ -202,6 +204,10 @@ function simulate(html, wait, duration, speed, teamname, university) {
 	}, 100);
 }
 
+function getTime(startTime) {
+  var curTime = new Date();
+  return Math.floor((curTime - startTime) / (60000 / SPEED)) + DELTA_TIME;
+}
 
 function createTeamPanel(nbProblems) {
   var div = document.createElement("div");
