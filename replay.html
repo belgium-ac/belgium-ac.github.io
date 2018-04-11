@@ -55,7 +55,7 @@
   <div class="input-group-prepend">
     <span class="input-group-text" id="basic-addon1">Team name:</span>
   </div>
-  <input id="teamname" type="text" class="form-control" value="Your team" placeholder="Your team" aria-label="time" aria-describedby="basic-addon1">
+  <input id="teamname" type="text" class="form-control" value="You" placeholder="" aria-label="time" aria-describedby="basic-addon1">
 </div>
 
 <div class="input-group mb-3">
@@ -152,7 +152,10 @@ function simulate(html, wait, duration, speed, teamname, university) {
         yourteam.times[pid] = time;
         fillScoreboard(time, teams);
       } else {
-        //event.target.className = 'btn btn-default';
+        event.target.className = 'btn btn-default';
+        yourteam.tries[pid] = 0
+        yourteam.times[pid] = INF;
+        fillScoreboard(time, teams);
       }
     }
   });
