@@ -154,13 +154,12 @@ function simulate(html, wait, duration, speed, start, teamname, university) {
       console.log(pid);
       if(event.target.className == 'btn btn-default') {
         event.target.className = 'btn btn-success';
-        yourteam.tries[pid] = 1
+        yourteam.tries[pid] += 1;
         var time = getTime(startTime);
         yourteam.times[pid] = time;
         fillScoreboard(time, teams);
       } else {
         event.target.className = 'btn btn-default';
-        yourteam.tries[pid] = 0
         yourteam.times[pid] = INF;
         fillScoreboard(getTime(startTime), teams);
       }
