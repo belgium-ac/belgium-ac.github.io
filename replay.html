@@ -103,7 +103,7 @@ function loadFile() {
     reader.readAsText(file, "UTF-8");
     reader.onload = function (evt) {
         text = evt.target.result;
-        simulate(text, wait, duration, speed, start, teamname, university);
+        simulate(file.name.endsWith('.json'), text, wait, duration, speed, start, teamname, university);
     }
     reader.onerror = function (evt) {
       alert('could not load file');
@@ -112,7 +112,7 @@ function loadFile() {
 }
 
 
-function simulate(html, wait, duration, speed, start, teamname, university) {
+function simulate(isjson, html, wait, duration, speed, start, teamname, university) {
 	ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	INF = 1000000000
 	DURATION = duration;
@@ -126,15 +126,26 @@ function simulate(html, wait, duration, speed, start, teamname, university) {
   DELTA_TIME = start;
   if(DELTA_TIME > 0) WAIT = -1;
 
-	var root = document.createElement('html');
-	root.innerHTML = html;
-  console.log(html);
-	parsers = detectParsers(root);
+  var teams = null;
+  var nbProblems = null;
 
-	var data = parseGeneral(root, parsers[0], parsers[1]);
-  var teams = data[0];
-  var nbProblems = data[1];
+  console.log(isjson); 
+  if(isjson) {    
+    var scoreboard = JSON.parse(html);
+    teams = scoreboard.teams
+    nbProblems = scoreboard.nbProblems
+  } else {
+		var root = document.createElement('html');
+		root.innerHTML = html;
+		console.log(html);
+		parsers = detectParsers(root);
 
+		var data = parseGeneral(root, parsers[0], parsers[1]);
+		teams = data[0];
+		nbProblems = data[1];
+  }
+
+  genRandomTimes(teams, nbProblems);
   
 
 	//text = readTextFile(path);
@@ -142,7 +153,7 @@ function simulate(html, wait, duration, speed, start, teamname, university) {
 
   createTableHeader(nbProblems);
 
-  var yourteam = createYourTeam();
+  var yourteam = createYourTeam(nbProblems);
   teams.push(yourteam);
 	
 	var startTime = new Date();
@@ -634,7 +645,7 @@ function domjudgeParseRow(row, nbProblems) {
   return team;
 }
 
-function createYourTeam() {
+function createYourTeam(nbProblems) {
   var yourteam = { }
   yourteam.tries = [ ];
   yourteam.times = [ ];
