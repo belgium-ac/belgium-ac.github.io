@@ -8,10 +8,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <script src="https://momentjs.com/downloads/moment.js"></script>
-  <script src="https://momentjs.com/downloads/moment-timezone-with-data.js"></script>
 </head>
-<body onload="setName()"> 
+<body> 
 
 
 <div class="jumbotron text-center">
@@ -28,83 +26,84 @@
     <span class="input-group-text">Scoreboard file:</span>
   </div>
   <div class="custom-file">
-    <input type="file" class="custom-file-input" id="file">
+    <input type="file" class="custom-file-input" id="file" onclick="setText()">
     <label id="path" class="custom-file-label" for="inputGroupFile01">Choose file</label>
   </div>
 </div>
 
 
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Wait time (s):</span>
+  </div>
+  <input id="wait" type="text" class="form-control" value="10" placeholder="10" aria-label="time" aria-describedby="basic-addon1">
 
-<div class="form-group">
-  <label for="sel1">Domjudge contest:</label>
-  <select class="form-control" id="contestlist">
-    <option>none</option>
-  </select>
-</div> 
+  <div class="input-group-prepend">
+   <span class="input-group-text" id="basic-addon1">Duration (m):</span>
+  </div>
+  <input id="duration" type="text" class="form-control" value="300" placeholder="" aria-label="time" aria-describedby="basic-addon1">
+
+
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Speed factor (s):</span>
+  </div>
+  <input id="speed" type="text" class="form-control" value="1" placeholder="" aria-label="time" aria-describedby="basic-addon1">
+  
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Start time (m):</span>
+  </div>
+  <input id="start" type="text" class="form-control" value="0" placeholder="" aria-label="time" aria-describedby="basic-addon1">
+  
+
+</div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">Team name:</span>
+  </div>
+  <input id="teamname" type="text" class="form-control" value="You" placeholder="" aria-label="time" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">University:</span>
+  </div>
+  <input id="university" type="text" class="form-control" placeholder="Your university name (optional)" aria-label="time" aria-describedby="basic-addon1">
+</div>
+
 
 <button type="button" class="btn btn-primary" onclick="loadFile()">Start simulation</button>
 </div>
+
 
 </body>
 
 <script>
 
-/*
-Load domjudge contests
-*/
-
-DJ_URL = 'http://domjudge.info.ucl.ac.be/api/';
-INF = 1000000000;
-ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-SPEED = 1;
-
-function setName() {
-  var file = document.getElementById("file").files[0];
-  if(file) {
-    document.getElementById("path").innerHTML = file.name;  
-  }
-}
-
-$.getJSON(DJ_URL + 'contests', function(contests) {
-  var list = document.getElementById("contestlist");
-  for(var cid in contests) {
-    var opt = document.createElement("option");
-    opt.innerHTML = contests[cid].shortname;
-    list.appendChild(opt);
-  }
-  updateSelection();
-});
-
-function updateSelection() {
-  var list = document.getElementById("contestlist");
-  var file = document.getElementById("file").files[0];
-  if(file) {
-    var filename = file.name.split('.')[0].toLowerCase();
-    var options = list.getElementsByTagName("option");
-    for(var i = 0; i < options.length; i++) {
-      if(options[i].innerHTML.toLowerCase() == filename) {
-        list.selectedIndex = "" + i;
-      }
-    } 
-  }
-}
-
 document.getElementById("file").onchange = function() {
   var filename = document.getElementById("file").files[0].name;
   document.getElementById("path").innerHTML = filename;
-  updateSelection();
+
 };
+
 
 function loadFile() {
   var file = document.getElementById("file").files[0];
   var text = null;
-  var djshortname = document.getElementById("contestlist").value;
+  var wait = parseInt(document.getElementById("wait").value);
+  var duration = parseInt(document.getElementById("duration").value);
+  var speed = parseInt(document.getElementById("speed").value);
+  var start = parseInt(document.getElementById("start").value);
+  var teamname = document.getElementById("teamname").value;
+  var university = document.getElementById("university").value;
+
+
   if (file) {
     var reader = new FileReader();
     reader.readAsText(file, "UTF-8");
     reader.onload = function (evt) {
-        data = evt.target.result;
-        loadData(data, file.name.endsWith('.json'), djshortname);
+        text = evt.target.result;
+        simulate(file.name.endsWith('.json'), text, wait, duration, speed, start, teamname, university);
     }
     reader.onerror = function (evt) {
       alert('could not load file');
@@ -113,241 +112,9 @@ function loadFile() {
 }
 
 
-function loadData(data, isjson, djshortname) {
-  var teams = null;
-  var nbProblems = null;
-  if(isjson) {
-    // data already well formated, just set it
-    var scoreboard = JSON.parse(data);
-    teams = scoreboard.teams;
-    nbProblems = scoreboard.nbProblems;
-    console.log('nb problems: ' + nbProblems)
-  } else {
-    // parse html
-    var root = document.createElement('html');
-		root.innerHTML = data;
-		parsers = detectParsers(root);
-		var data = parseGeneral(root, parsers[0], parsers[1]);
-		teams = data[0];
-		nbProblems = data[1];
-  }
-  // load the domjudge data
-  if(djshortname == 'none') {
-    simulate2(teams, nbProblems, null, null);
-  } else {
-		$.getJSON(DJ_URL + 'contests', function(contests) {
-		  for(var cid in contests) {
-		    if(contests[cid].shortname == djshortname) {
-		      var djcontest = contests[cid];
-					$.getJSON(DJ_URL + 'teams', function(djteams) {
-		        var djnamemap = { }
-						for(var i = 0; i < djteams.length; i++) {
-							djnamemap[djteams[i].id] = djteams[i].name;
-						}
-		        simulate2(teams, nbProblems, djcontest, djnamemap);
-		      });
-		    }
-		  }
-		});
-  }
-}
-
-function simulate2(teams, nbProblems, djcontest, djnamemap) {
-  var startTime = moment.tz("Europe/Amsterdam");
-  var endTime = moment.tz("Europe/Amsterdam");
-  endTime = endTime.add(5, 'hours');
-  if(djcontest != null) {
-    startTime = moment.tz(djcontest.start * 1000, "Europe/Amsterdam");
-    endTime = moment.tz(djcontest.end * 1000, "Europe/Amsterdam");
-  }
-  console.log('start time: ' + startTime);
-  console.log('end time: ' + endTime);
-  var duration = msToMinutes(endTime - startTime);
-  console.log('duration: ' + duration);
-  initializeScoreboard(nbProblems);
-  createTableHeader(nbProblems);
-  genRandomTimes(teams, nbProblems, duration);
-  // start wait timer
-  var curTime = moment.tz("Europe/Amsterdam");
-  if(curTime >= startTime) {
-    runContest(startTime, endTime, duration, teams, djcontest, djnamemap);
-  } else {
-    contestUpdate = setInterval(function() {
-		  $.getJSON(DJ_URL + 'contests', function(contests) {
-				for(var cid in contests) {
-          console.log(cid + ' ' + djcontest.id);
-				  if(cid == djcontest.id) {
-				    startTime = moment.tz(contests[cid].start * 1000, "Europe/Amsterdam");
-            endTime = moment.tz(contests[cid].end * 1000, "Europe/Amsterdam");
-				  }
-				}
-			});
-		}, 2000);
-    updateWait(startTime);
-    console.log('starting wait timer');
-    waitTimer = setInterval(function() {
-      var curTime = moment.tz("Europe/Amsterdam");
-      var waitTimeleft = msToSeconds(startTime - curTime); 
-      updateWait(startTime);
-      if(waitTimeleft < 0) {
-        clearInterval(waitTimer);
-        clearInterval(contestUpdate);
-        runContest(startTime, endTime, duration, teams, djcontest, djnamemap);
-      }
-    }, 1000);
-  }
-  
-}
-
-function msToMinutes(ms) {
-  return Math.floor(ms / (1000 * 60));
-}
-
-function msToSeconds(ms) {
-  return Math.floor(ms / 1000);
-}
-
-function runContest(startTime, endTime, duration, teams, djcontest, djnamemap) {
-  var curTime = moment.tz("Europe/Amsterdam");
-  console.log('starting to run contest');
-  updateProgress(startTime, endTime, duration);
-  progressTimer = setInterval(function() {
-    updateProgress(startTime, endTime, duration);
-  }, 1000);
-  updateScoreboard(msToMinutes(curTime - startTime), teams, djcontest, djnamemap);
-  contestUpdate = setInterval(function() {
-		  $.getJSON(DJ_URL + 'contests', function(contests) {
-				for(var cid in contests) {
-          console.log(cid + ' ' + djcontest.id);
-				  if(cid == djcontest.id) {
-				    startTime = moment.tz(contests[cid].start * 1000, "Europe/Amsterdam");
-            endTime = moment.tz(contests[cid].end * 1000, "Europe/Amsterdam");
-				  }
-				}
-			});
-	}, 2000);
-  contestTimer = setInterval(function() {
-    var curTime = moment.tz("Europe/Amsterdam");
-		var contestTimeLeft = msToMinutes(endTime - curTime);
-    if(contestTimeLeft < 0) {
-      clearInterval(progressTimer);
-			clearInterval(contestTimer);
-      document.getElementById('bar').className = 'progress-bar progress-bar-striped'
-			document.getElementById('bar').style = 'width: 100%';			
-      updateScoreboard(msToMinutes(curTime - startTime), teams, djcontest, djnamemap); 
-    } else {
-      updateScoreboard(msToMinutes(curTime - startTime), teams, djcontest, djnamemap);
-    }
-  }, 10000);
-}
-
-function elapsedMinutes(startTime) {
-  return msToMinutes(getElapsedTime(startTime));
-}
-
-function getElapsedTime(startTime) {
-  var curTime = moment.tz("Europe/Amsterdam");
-  return SPEED * (curTime - startTime);
-}
-
-function getTimeLeft(endTime) {
-  var curTime = moment.tz("Europe/Amsterdam");
-  return SPEED * (endTime - curTime);  
-}
-
-function updateWait(startTime) {
-  var curTime = moment.tz("Europe/Amsterdam");
-  var seconds = msToSeconds(startTime - curTime);
-  setTimeLeft(seconds, 'Starting now!', 'Starting in:');
-}
-
-function updateProgress(startTime, endTime, duration) {
-  var elapsedMS = getElapsedTime(startTime);
-  var curTime = moment.tz("Europe/Amsterdam");
-  var minutes = msToMinutes(elapsedMS);
-  var percent =  Math.floor(100 * minutes / duration);
-	document.getElementById('bar').style = 'width: ' + percent + '%';
-  var durationMS = endTime - startTime;
-  var seconds = msToSeconds(durationMS - elapsedMS);
-  setTimeLeft(seconds, 'Contest ended.', 'Time left:');
-}
-
-function setTimeLeft(seconds, goTxt, prefix) {
-  if(seconds <= 0) {
-    document.getElementById('timeleft').innerHTML = goTxt;
-  } else if(seconds >= 3600) {
-    var h = Math.floor(seconds / 3600);
-    seconds %= 3600;
-    var m = Math.floor(seconds / 60);
-    seconds %= 60;
-    var s = seconds;
-    if(h < 10) h = '0' + h;
-    if(m < 10) m = '0' + m;
-    if(s < 10) s = '0' + s;
-    document.getElementById('timeleft').innerHTML = prefix + ' ' + h + 'h' + m + 'm' + s + 's';
-  } else if(seconds >= 60) {
-    var m = Math.floor(seconds / 60);
-    seconds %= 60;
-    var s = seconds;
-    if(m < 10) m = '0' + m;
-    if(s < 10) s = '0' + s;
-    document.getElementById('timeleft').innerHTML = prefix + ' ' + m + 'm' + s + 's';
-  } else {
-    document.getElementById('timeleft').innerHTML = prefix + ' ' + seconds + 's';
-  }
-}
-
-function setWaitTimeLeft(seconds) {
-  left = WAIT - seconds;
-  if(left <= 0) {
-      document.getElementById('timeleft').innerHTML = 'Starting now!';
-  } else if(left >= 60) {
-    m = Math.floor(left / 60);
-    s = left % 60;
-    if(m < 10) m = '0' + m;
-    if(s < 10) s = '0' + s;
-    document.getElementById('timeleft').innerHTML = 'Starting in: ' + m + 'm' + s + 's';
-  } else {
-    document.getElementById('timeleft').innerHTML = 'Starting in: ' + left + 's';
-  }
-}
-
-/*
-function setTimeLeft(left) {
-  left = Math.floor(left);
-  if(left <= 0) {
-    document.getElementById('timeleft').innerHTML = 'Contest ended';
-  } else if(left >= 60) {
-    h = Math.floor(left / 60);
-    m = Math.floor(left % 60);
-    if(h < 10) h = '0' + h;
-    if(m < 10) m = '0' + m;
-    document.getElementById('timeleft').innerHTML = 'Time left: ' + h + 'h' + m + 'm';
-  } else {
-    document.getElementById('timeleft').innerHTML = 'Time left: ' + left + 'm';
-  }
-}
-*/
-
-
-function getMinutes(ms) {
-  return Math.floor(ms / (1000 * 60));
-}
-
-function formatTime(ms) {
-  var s = ms / 1000;
-  h = Math.floor(s / 3600);
-  s %= 3600;
-  m = Math.floor(s / 60);
-  s %= 60;
-  s = Math.floor(s);
-  if(h < 10) h = '0' + h;
-  if(m < 10) m = '0' + m;
-  if(s < 10) s = '0' + s;
-  return h + 'h' + m + 'm' + s + 's'; 
-}
-
 function simulate(isjson, html, wait, duration, speed, start, teamname, university) {
+	ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	INF = 1000000000
 	DURATION = duration;
 	DELTA1 = 15;
 	DELTA2 = 5;
@@ -361,12 +128,12 @@ function simulate(isjson, html, wait, duration, speed, start, teamname, universi
 
   var teams = null;
   var nbProblems = null;
-  
+
+  console.log(isjson); 
   if(isjson) {    
     var scoreboard = JSON.parse(html);
     teams = scoreboard.teams
     nbProblems = scoreboard.nbProblems
-    console.log('nb problems: ' + nbProblems);
   } else {
 		var root = document.createElement('html');
 		root.innerHTML = html;
@@ -386,8 +153,8 @@ function simulate(isjson, html, wait, duration, speed, start, teamname, universi
 
   createTableHeader(nbProblems);
 
-  //var yourteam = createYourTeam(nbProblems);
-  //teams.push(yourteam);
+  var yourteam = createYourTeam(nbProblems);
+  teams.push(yourteam);
 	
 	var startTime = new Date();
 
@@ -410,31 +177,12 @@ function simulate(isjson, html, wait, duration, speed, start, teamname, universi
     }
   });
 
-	timer = setInterval(function() {
-    score(teams, 'Tsukuba17');
-    /*
-		var time = getTime(startTime);
-		setTimeLeft(time);
-		if(time > DURATION) {
-			fillScoreboard(DURATION, teams, yourteam);
-			document.getElementById('bar').className = 'progress-bar progress-bar-striped'
-			document.getElementById('bar').style = 'width: 100%';
-			clearInterval(timer);
-      RUNNING = false;
-		} else {
-			var percent =  Math.floor(100 * time / DURATION);
-			document.getElementById('bar').style = 'width: ' + percent + '%';
-			fillScoreboard(time, teams);
-		}
-    */
-	}, 5000);
-
 	//alert(text);
 
 
 	//teams = parseCERC(root);
 	//teams = parseDomjudge(root);
-/*
+
   var time = getTime(startTime);
   fillScoreboard(time, teams);
 
@@ -464,20 +212,12 @@ function simulate(isjson, html, wait, duration, speed, start, teamname, universi
 		  clearInterval(waitTimer);
 		}
 	}, 100);
-*/
 }
-
 
 function getTime(startTime) {
   var curTime = new Date();
   return Math.floor((curTime - startTime) / (60000 / SPEED)) + DELTA_TIME;
 }
-
-/*
-function getCurTime() {
-  return new Date() + new Date(7200000);
-}
-*/
 
 function createTeamPanel(nbProblems) {
   var div = document.createElement("div");
@@ -550,7 +290,7 @@ function createTeamPanel(nbProblems) {
 
 function initializeScoreboard(nbProblems) {
   document.body.innerHTML = '';
-  //createTeamPanel(nbProblems);
+  createTeamPanel(nbProblems);
   document.body.innerHTML += '<br><div class="container-fluid"><h3 id="title">Scoreboard</h3><div id="timeleft"></div><div class="progress"><div id="bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div><table class="table"><thead><tr id="tableheader"><th>Rank</th><th class="name">Team</th><th class="name">University</th><th class="problems">Solved</th><th class="score">Time</th></tr></thead><tbody id="tablebody"></tbody>';
   /*
   var element = document.getElementById("menu");
@@ -623,22 +363,35 @@ function initializeScoreboard(nbProblems) {
   
 }
 
-function setWaitTimeLeft(timeleft) {
-  if(timeleft <= 0) {
-    document.getElementById('timeleft').innerHTML = 'Starting now!';
+function setWaitTimeLeft(seconds) {
+  left = WAIT - seconds;
+  if(left <= 0) {
+      document.getElementById('timeleft').innerHTML = 'Starting now!';
+  } else if(left >= 60) {
+    m = Math.floor(left / 60);
+    s = left % 60;
+    if(m < 10) m = '0' + m;
+    if(s < 10) s = '0' + s;
+    document.getElementById('timeleft').innerHTML = 'Starting in: ' + m + 'm' + s + 's';
   } else {
-    document.getElementById('timeleft').innerHTML = 'Time left: ' + formatTime(timeleft);
+    document.getElementById('timeleft').innerHTML = 'Starting in: ' + left + 's';
   }
 }
 
-function setContestTimeLeft(timeleft) {
-  if(timeleft <= 0) {
+function setTimeLeft(time) {
+  left = DURATION - time;
+  if(left <= 0) {
     document.getElementById('timeleft').innerHTML = 'Contest ended';
+  } else if(left >= 60) {
+    h = Math.floor(left / 60);
+    m = left % 60;
+    if(h < 10) h = '0' + h;
+    if(m < 10) m = '0' + m;
+    document.getElementById('timeleft').innerHTML = 'Time left: ' + h + 'h' + m + 'm';
   } else {
-    document.getElementById('timeleft').innerHTML = 'Time left: ' + formatTime(timeleft);
+    document.getElementById('timeleft').innerHTML = 'Time left: ' + left + 'm';
   }
 }
-
 
 function fillScoreboard(time, teams) {
   var curTeams = [ ];
@@ -659,7 +412,7 @@ function fillScoreboard(time, teams) {
         totalTime += teams[i].times[j] + 20 * (teams[i].tries[j] - 1);
       } else {
         var tries = 0;
-        for(var k = 0; k < teams[i].wrongTries[j].length; k++) {
+        for(var k = 0; k < teams[i].wrongTries.length; k++) {
           if(time >= teams[i].wrongTries[j][k]) {
             tries++;
             totalTries += 1;
@@ -676,47 +429,43 @@ function fillScoreboard(time, teams) {
   }
   // sort and create table
   curTeams.sort(compareTeams);
-  var rank = 0;
+  var rank = 1;
   var elem = document.getElementById('tablebody');
   elem.innerHTML = '';
   for(var i = 0; i < curTeams.length; i++) {
-    rank += 1;
     if(i > 0 && !sameRank(curTeams[i - 1], curTeams[i])) {
-      curTeams[i].rank = curTeams[i - 1].rank;  
-    } else {
-      curTeams[i].rank = rank;
+      rank += 1;
     }
-    /*
-    if(curTeams[i].university == 'Local team') {
+    curTeams[i].rank = rank;
+    if(curTeams[i].name == TEAM_NAME) {
       document.getElementById('yourRank').innerHTML = curTeams[i].rank;
       document.getElementById('yourSolved').innerHTML = curTeams[i].nbSolved;
       document.getElementById('yourTime').innerHTML = curTeams[i].totalTime;
     }
-    */
 
     var row = document.createElement('tr');
     col = document.createElement('th');
-    if(curTeams[i].university == 'Local team') col.className = 'table-warning';
+    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = rank;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].university == 'Local team') col.className = 'table-warning';
+    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].name;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].university == 'Local team') col.className = 'table-warning';
+    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].university;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].university == 'Local team') col.className = 'table-warning';
+    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].nbSolved;
     row.appendChild(col);
 
     col = document.createElement('th');
-    if(curTeams[i].university == 'Local team') col.className = 'table-warning';
+    if(curTeams[i].name == TEAM_NAME) col.className = 'table-warning';
     col.innerHTML = curTeams[i].totalTime;
     row.appendChild(col);
 
@@ -796,7 +545,7 @@ function parseGeneral(root, findNbProblems, parseTeam) {
 
 
 
-function genRandomTimes(teams, nbProblems, duration) {
+function genRandomTimes(teams, nbProblems) {
   var averages = [ ];
   var minimums = [ ];
   var globalMin = 300;
@@ -812,7 +561,7 @@ function genRandomTimes(teams, nbProblems, duration) {
       }
     }
     if(count == 0) {
-      averages.push(duration);
+      averages.push(DURATION);
     } else {
       averages.push(Math.floor(total / count));
     }
@@ -828,8 +577,8 @@ function genRandomTimes(teams, nbProblems, duration) {
       if(teams[t].times[p] < INF) nbTries -= 1;
       f = gaussian(averages[p], 1);
       while(wt.length < nbTries) {
-        var time = getRandomInt(duration);
-        if(!set.has(time) && time >= Math.max(1, Math.max(globalMin - 2, 0.75 * minimums[p])) && time <= Math.min(teams[t].times[p] - 1, duration)) {
+        var time = getRandomInt(DURATION);
+        if(!set.has(time) && time >= Math.max(1, Math.max(globalMin - 2, 0.75 * minimums[p])) && time <= Math.min(teams[t].times[p] - 1, DURATION)) {
           set.add(time);
           wt.push(time);
         }
@@ -1058,82 +807,8 @@ function gaussian(mean, stdev) {
    }
 }
 
-/*
-DOMJUDGE API
-*/
-
-function getElapsedMinutes(startTime) {
-  var curTime = moment.tz("Europe/Amsterdam");
-  return Math.floor(curTime.diff(startTime) / 60000);
-}
-
-
-function updateScoreboard(curTime, teams, djcontest, djnamemap) {
-  console.log(curTime);
-  if(djcontest == null) {
-	  fillScoreboard(curTime, teams);
-  } else {
-		djteams = [ ]
-		$.getJSON(DJ_URL + 'scoreboard?cid=' + djcontest.id, function(djscoreboard) {
-			for(var i = 0; i < djscoreboard.length; i++) {
-				team = { }
-				team.tries = [ ]
-				team.times = [ ]
-				team.wrongTries = [ ]
-				var teamid = djscoreboard[i].team;
-				team.name = djnamemap[teamid];
-		    team.university = 'Local team';
-				for(var j = 0; j < djscoreboard[i].problems.length; j++) {
-		      var wt = [ ]
-				  if(djscoreboard[i].problems[j].solved) {
-				    team.times.push(parseInt(djscoreboard[i].problems[j].time));
-				    team.tries.push(parseInt(djscoreboard[i].problems[j].num_judged));
-				  } else {
-				    team.times.push(INF);
-				    team.tries.push(parseInt(djscoreboard[i].problems[j].num_judged));
-		        for(var k = 0; k < team.tries[j]; k++) {
-		          wt.push(curTime);
-		        }
-				  }
-				  team.wrongTries.push(wt);
-				}
-				djteams.push(team);
-			}
-			for(var i = 0; i < teams.length; i++) {
-				djteams.push(teams[i]);
-			}
-			fillScoreboard(curTime, djteams);
-		});
-  }
-}
-
-function readDomjudgeContest(contestName) {
-}
-
-function djContestId(contestName) {
-    
-}
-
-function getCurTime() {
-  return (new Date()).getMilliseconds() + 7200000; 
-}
-
-function djConverTime(djtimestamp) {
-  return djtimestamp * 1000 + 7200000;
-}
-
-function djGetContests(shortname) {
-  $.getJSON(DJ_URL + 'contests', function(contests) {
-    for(var cid in contests) {
-      if(contests[cid].shortname == shortname) {
-        score({}, contests[cid]);
-      }
-    }
-  });
-}
-
-//console.log(contest);
 
 </script>
 
 </html>
+
